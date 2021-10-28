@@ -57,7 +57,7 @@ const coasterSchema = mongoose.Schema({
     },
     rating: {
         type: Number,
-        required: true,
+        required: false,
         min: 1,
         max: 5
     },
@@ -75,7 +75,7 @@ const parkSchema = mongoose.Schema({
     },
     rating: {
         type: Number,
-        required: true,
+        required: false,
         min: 1,
         max: 5
     },
