@@ -28,7 +28,7 @@ Sample Review:
   author: // a reference to a User document
   postTime: // stores the time the review was posted
   rating: 5,
-  text: “Great, would ride again”
+  body: “Great, would ride again”
 }
 ```
 
