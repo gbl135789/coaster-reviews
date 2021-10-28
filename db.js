@@ -1,5 +1,7 @@
 
+const slugGenerator = require("mongoose-slug-generator");
 const mongoose = require("mongoose");
+mongoose.plugin(slugGenerator);
 
 /*
 -users have a type, username, and password
@@ -16,16 +18,20 @@ const userSchema = mongoose.Schema({
     },
     username: {
         type: String,
+        minLength: 5,
+        maxLength: 30,
         required: true
     },
     password: {
         type: String,
+        minLength: 5,
+        maxLength: 30,
         required: true
     }
 });
 
 /*
--reviews have an author, rating, and body
+-reviews have an author, post time, rating, and body
 -the rating must be a number between 1 and 5
 */
 const reviewSchema = mongoose.Schema({
@@ -34,6 +40,7 @@ const reviewSchema = mongoose.Schema({
         ref: "User",
         required: true
     },
+    postTime: Date,
     rating: {
         type: Number,
         required: true,
@@ -47,46 +54,42 @@ const reviewSchema = mongoose.Schema({
 });
 
 /*
--coasters have a name, rating, and a list of reviews
--the rating must be a number between 1 and 5
+-coasters have a name, a list of reviews, and a slug
+-the rating will be calculated by taking the average of the review ratings
 */
 const coasterSchema = mongoose.Schema({
     name: {
         type: String,
         required: true
     },
-    rating: {
-        type: Number,
-        required: false,
-        min: 1,
-        max: 5
-    },
-    reviews: [reviewSchema]
+    reviews: [reviewSchema],
+    slug: {
+        type: String,
+        slug: "name"
+    }
 });
 
 /*
--parks have a name, rating, and a list of reviews
--the rating must be a number between 1 and 5
+-parks have a name, a list of reviews, and a slug
+-the rating will be calculated by taking the average of the coaster ratings
 */
 const parkSchema = mongoose.Schema({
     name: {
         type: String,
         required: true
     },
-    rating: {
-        type: Number,
-        required: false,
-        min: 1,
-        max: 5
-    },
-    coasters: [coasterSchema]
+    coasters: [coasterSchema],
+    slug: {
+        type: String,
+        slug: "name"
+    }
 });
 
-coasterSchema.methods.updateRating = function(cb) {
+coasterSchema.methods.calcRating = function(cb) {
     // TODO
 };
 
-parkSchema.methods.updateRating = function(cb) {
+parkSchema.methods.calcRating = function(cb) {
     // TODO
 };
 
