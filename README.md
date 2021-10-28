@@ -69,6 +69,14 @@ Common header:
 
 ![list create](documentation/home.png)
 
+/login - login page
+
+![list create](documentation/login.png)
+
+/register - registration page
+
+![list create](documentation/register.png)
+
 /parks - page for displaying all parks
 
 ![list](documentation/parks-coasters.png)
@@ -104,30 +112,24 @@ Common header:
 
 ## Research Topics
 
-(___TODO__: the research topics that you're planning on working on along with their point values... and the total points of research topics listed_)
+* (4 points, estimated) Front end framework
+  * Candidates: React, Vue, Angular
+  * These frameworks provide powerful methods for creating and managing user interfaces. I will use a framework to handle site presentation and user interactivity such as sorting, filtering, posting/deleting reviews, etc.
+* (3 points, estimated) Configuration management
+  * Candidates: nconf, Node convict
+  * It is often the case that the app's behavior needs to be modified to suit its production environment, such as disabling logging and connecting to different databases. I will use a library to help me manage development and production configurations.
+* (1 point, estimated) Slug generation for routing
+  * Candidates: Mongoose slug generator, slugify
+  * The site will potentially have many parks and coasters. It would be convenient to automatically generate a slug whenever a new park or coaster is added. I will use a library to generate slugs for each new park and coaster.
 
-* (5 points) Integrate user authentication
-    * I'm going to be using passport for user authentication
-    * And account has been made for testing; I'll email you the password
-    * see <code>cs.nyu.edu/~jversoza/ait-final/register</code> for register page
-    * see <code>cs.nyu.edu/~jversoza/ait-final/login</code> for login page
-* (4 points) Perform client side form validation using a JavaScript library
-    * see <code>cs.nyu.edu/~jversoza/ait-final/my-form</code>
-    * if you put in a number that's greater than 5, an error message will appear in the dom
-* (5 points) vue.js
-    * used vue.js as the frontend framework; it's a challenging library to learn, so I've assigned it 5 points
-
-10 points total out of 8 required points (___TODO__: addtional points will __not__ count for extra credit_)
+Total points: 8
 
 
 ## [Link to Initial Main Project File](app.js) 
 
-(___TODO__: create a skeleton Express application with a package.json, app.js, views folder, etc. ... and link to your initial app.js_)
 
 ## Annotations / References Used
 
-(___TODO__: list any tutorials/references/etc. that you've based your code off of_)
-
-1. [passport.js authentication docs](http://passportjs.org/docs) - (add link to source code that was based on this)
-2. [tutorial on vue.js](https://vuejs.org/v2/guide/) - (add link to source code that was based on this)
-
+1. [docs on React](https://reactjs.org/docs/getting-started.html) - (add link to source code that was based on this)
+2. [docs on Node convict](https://www.npmjs.com/package/convict) - (add link to source code that was based on this)
+2. [docs on Mongoose slug generator](https://www.npmjs.com/package/mongoose-slug-generator) - (add link to source code that was based on this)
