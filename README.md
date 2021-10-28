@@ -1,17 +1,15 @@
-The content below is an example project proposal / requirements document. Replace the text below the lines marked "__TODO__" with details specific to your project. Remove the "TODO" lines.
-
 # Coaster Reviews
 
 ## Overview
 
-The world is full of magical theme parks and roller coasters, with more popping up each year. This is great and all, until one is faced with the task of planning a vacation to one of these destinations. Thanks to the paradox of choice, deciding which park(s) to visit can be quite stressful. This site serves to aid financially constrained theme park/coaster enthusiasts in deciding where to spend their hard earned bucks.
+The world is full of magical theme parks and roller coasters, with more popping up each year. This is exciting, until one is faced with the task of planning a vacation to one of these destinations. Thanks to the paradox of choice, deciding which park(s) to visit can be quite stressful. This site serves to aid financially constrained theme park/coaster enthusiasts in deciding where to spend their hard earned bucks.
 
 Coaster Reviews is a web app that allows users to review and read reviews of roller coasters from around the world. Users can register and login. Anyone can read reviews, but only logged in users can post new reviews.
 
 
 ## Data Model
 
-The app will store Users, Parks, Coasters, and Reviews. Parks and Coasters will be displayed with a rating between 1 and 5. Coaster ratings are calculated with the average rating of its reviews. Park ratings are calculated with the average rating of its Coasters.
+The app will store Users, Parks, Coasters, and Reviews. Parks and Coasters will be displayed with a rating between 1 and 5. Coaster ratings are calculated with the average rating of its reviews. Park ratings are calculated with the average rating of its Coasters. Coaster and park ratings are not stored explicitly but are calculated each time they are rendered.
 
 Sample User:
 
@@ -28,6 +26,7 @@ Sample Review:
 ```javascript
 {
   author: // a reference to a User document
+  postTime: // stores the time the review was posted
   rating: 5,
   text: “Great, would ride again”
 }
@@ -38,7 +37,6 @@ Sample Coaster:
 ```javascript
 {
   name: “Superman The Ride”,
-  rating: 4.8, // the average of each review rating
   reviews: // a list of Review subdocuments
 }
 ```
@@ -48,7 +46,6 @@ Sample Park:
 ```javascript
 {
   name: “Six Flags New England”,
-  rating: 4.4 // the average of each coaster rating
   coasters: // a list of Coaster subdocuments
 }
 ```
@@ -58,8 +55,6 @@ Sample Park:
 
 
 ## Wireframes
-
-(___TODO__: wireframes for all of the pages on your site; they can be as simple as photos of drawings or you can use a tool like Balsamiq, Omnigraffle, etc._)
 
 Common header:
 
@@ -115,7 +110,7 @@ Common header:
 * (4 points, estimated) Front end framework
   * Candidates: React, Vue, Angular
   * These frameworks provide powerful methods for creating and managing user interfaces. I will use a framework to handle site presentation and user interactivity such as sorting, filtering, posting/deleting reviews, etc.
-* (3 points, estimated) Configuration management
+* (3 points) Configuration management
   * Candidates: nconf, Node convict
   * It is often the case that the app's behavior needs to be modified to suit its production environment, such as disabling logging and connecting to different databases. I will use a library to help me manage development and production configurations.
 * (1 point, estimated) Slug generation for routing
