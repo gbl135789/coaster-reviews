@@ -4,7 +4,9 @@
 {{/if}}
 
 <form method="POST" action="/login">
-    <input name="username" type="text" placeholder="username">
-    <input name="password" type="password" placeholder="password">
-    <input type="submit" value="Login">
+    <input name="username" type="text" placeholder="username" required><br>
+    <input name="password" type="password" placeholder="password" required><br>
+    <input type="submit" value="Login"><br>
 </form>
+
+<p>Don't have an account? <a href="/register">Register</a></p>

@@ -16,23 +16,21 @@ const messages = {
 
 Object.freeze(messages);
 
-passport.use("local-login", new LocalStrategy(
-    { passReqToCallback: true },
-    (req, username, password, done) => {
-        User.findOne({ username: username }, (err, user) => {
-            if(err) {
-                console.log("login1");
-                done(null, false, req.flash("errorMessage", messages.error.internal));
-            } else if(!user || !user.isValidPassword(password)) {
-                console.log("login2");
-                done(null, false, req.flash("errorMessage", messages.error.login));
-            } else {
-                console.log("login3");
-                done(null, user);
-            }
-        });
+// attempt to log in a user, catching errors other than username/password mismatch as needed
+async function handleLogin(req, username, password, done) {
+    try {
+        const user = await User.findOne({ username: username });
+        if(!user || !(await user.isValidPassword(password))) {
+            done(null, false, req.flash("errorMessage", messages.error.login));
+        } else {
+            done(null, user);
+        }
+    } catch(err) {
+        done(null, false, req.flash("errorMessage", messages.error.internal));
     }
-));
+}
+
+passport.use("local-login", new LocalStrategy({ passReqToCallback: true }, handleLogin));
 
 passport.serializeUser(function(user, done) {
     done(null, user.id);
@@ -45,34 +43,27 @@ passport.deserializeUser(function(id, done) {
 });
 
 function handleRegistrationError(err, req, done) {
-    console.log(err);
     const errors = err.errors;
     if(errors.username && errors.username.kind === "unique") {
-        console.log("register1");
         done(null, false, req.flash("errorMessage", messages.error.usernameRegisTaken));
     } else if(errors.username) {
-        console.log("register2");
         done(null, false, req.flash("errorMessage", messages.error.usernameRegisInvalid));
     } else if(errors.password) {
-        console.log("register3");
         done(null, false, req.flash("errorMessage", messages.error.passwordRegis));
     } else {
-        console.log("register4");
         done(null, false, req.flash("errorMessage", messages.error.internal));
     }
 }
 
-// register a user and start an authenticated session
-passport.use("local-register", new LocalStrategy(
-    { passReqToCallback: true },
-    (req, username, password, done) => {
-        User.create({ type: "user", username: username, password: password })
-            .then(user => done(null, user))
-            .catch(err => handleRegistrationError(err, req, done));
+// attempt to register a user, catching errors such as schema validation as needed
+// password hashing is handled by Mongoose pre-save middleware
+async function handleRegistration(req, username, password, done) {
+    try {
+        const user = await User.create({ type: "user", username: username, password: password });
+        done(null, user);
+    } catch(err) {
+        handleRegistrationError(err, req, done);
     }
-));
+}
 
-// module.exports = {
-//     messages,
-//     registerUser
-// };
+passport.use("local-register", new LocalStrategy({ passReqToCallback: true }, handleRegistration));

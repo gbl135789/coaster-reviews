@@ -94,8 +94,8 @@ const parkSchema = mongoose.Schema({
 });
 
 userSchema.methods.isValidPassword = function(password) {
-    return bcrypt.compareSync(password, this.password);
-}
+    return bcrypt.compare(password, this.password);
+};
 
 coasterSchema.methods.calcRating = function(cb) {
     // TODO
@@ -111,17 +111,8 @@ Review: update coaster and park rating
 */
 
 // middleware for salting and hashing password
-userSchema.pre("save", function(next) {
-    console.log("middleware called", this.username, this.password);
-    bcrypt.hash(this.password, 10, (err, hash) => {
-        if(err) {
-            console.log("middleware error");
-            next(err);
-        } else {
-            this.password = hash;
-            next();
-        }
-    });
+userSchema.pre("save", async function() {
+    this.password = await bcrypt.hash(this.password, 10);
 });
 
 const User = mongoose.model("User", userSchema);
