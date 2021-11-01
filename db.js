@@ -1,7 +1,10 @@
 
 const slugGenerator = require("mongoose-slug-generator");
+const uniqueValidator = require("mongoose-unique-validator");
 const mongoose = require("mongoose");
 mongoose.plugin(slugGenerator);
+
+const bcrypt = require("bcrypt");
 
 /*
 -users have a type, username, and password
@@ -18,17 +21,22 @@ const userSchema = mongoose.Schema({
     },
     username: {
         type: String,
+        required: true,
         minLength: 5,
         maxLength: 30,
-        required: true
+        validate: v => v.length > 0 && !v.match(/\s/),
+        unique: true
     },
     password: {
         type: String,
+        required: true,
         minLength: 5,
         maxLength: 30,
-        required: true
+        validate: v => v.length > 0 && !v.match(/\s/)
     }
 });
+
+userSchema.plugin(uniqueValidator);
 
 /*
 -reviews have an author, post time, rating, and body
@@ -85,6 +93,10 @@ const parkSchema = mongoose.Schema({
     }
 });
 
+userSchema.methods.isValidPassword = function(password) {
+    return bcrypt.compareSync(password, this.password);
+}
+
 coasterSchema.methods.calcRating = function(cb) {
     // TODO
 };
@@ -97,6 +109,20 @@ parkSchema.methods.calcRating = function(cb) {
 User: salt and hash password
 Review: update coaster and park rating
 */
+
+// middleware for salting and hashing password
+userSchema.pre("save", function(next) {
+    console.log("middleware called", this.username, this.password);
+    bcrypt.hash(this.password, 10, (err, hash) => {
+        if(err) {
+            console.log("middleware error");
+            next(err);
+        } else {
+            this.password = hash;
+            next();
+        }
+    });
+});
 
 const User = mongoose.model("User", userSchema);
 const Review = mongoose.model("Review", reviewSchema);

@@ -113,11 +113,14 @@ Common header:
 * (3 points) Configuration management
   * Candidates: nconf, Node convict
   * It is often the case that the app's behavior needs to be modified to suit its production environment, such as disabling logging and connecting to different databases. I will use a library to help me manage development and production configurations.
+* (2 points) Authentication
+  * Candidates: Passport
+  * In order to support user accounts and role based authorization, There needs to be a way to securely store and retrieve sensitive user information. I will use Passport to integrate username/password authentication in the app.
 * (1 point, estimated) Slug generation for routing
   * Candidates: Mongoose slug generator, slugify
   * The site will potentially have many parks and coasters. It would be convenient to automatically generate a slug whenever a new park or coaster is added. I will use a library to generate slugs for each new park and coaster.
 
-Total points: 8
+Total points: 10
 
 
 ## [Link to Initial Main Project File](app.js) 
@@ -127,4 +130,5 @@ Total points: 8
 
 1. [docs on React](https://reactjs.org/docs/getting-started.html) - (add link to source code that was based on this)
 2. [docs on Node convict](https://www.npmjs.com/package/convict) - (add link to source code that was based on this)
-2. [docs on Mongoose slug generator](https://www.npmjs.com/package/mongoose-slug-generator) - (add link to source code that was based on this)
+3. [docs on Passport](http://www.passportjs.org/docs/) - (add link to source code that was based on this)
+4. [docs on Mongoose slug generator](https://www.npmjs.com/package/mongoose-slug-generator) - (add link to source code that was based on this)
