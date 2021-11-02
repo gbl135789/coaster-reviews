@@ -1,6 +1,7 @@
 
 const slugGenerator = require("mongoose-slug-generator");
 const uniqueValidator = require("mongoose-unique-validator");
+const autopopulate = require("mongoose-autopopulate");
 const mongoose = require("mongoose");
 mongoose.plugin(slugGenerator);
 
@@ -46,7 +47,8 @@ const reviewSchema = mongoose.Schema({
     author: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
-        required: true
+        required: true,
+        // autopopulate: true
     },
     postTime: Date,
     rating: {
@@ -68,12 +70,22 @@ const reviewSchema = mongoose.Schema({
 const coasterSchema = mongoose.Schema({
     name: {
         type: String,
-        required: true
+        required: true,
+        trim: true
     },
-    reviews: [reviewSchema],
+    rating: {
+        type: String,
+        default: "None"
+    },
+    reviews: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Review",
+        // autopopulate: true
+    }],
     slug: {
         type: String,
-        slug: "name"
+        slug: "name",
+        unique: true
     }
 });
 
@@ -84,36 +96,99 @@ const coasterSchema = mongoose.Schema({
 const parkSchema = mongoose.Schema({
     name: {
         type: String,
-        required: true
+        required: true,
+        trim: true
     },
-    coasters: [coasterSchema],
+    rating: {
+        type: String,
+        default: "None"
+    },
+    coasters: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Coaster",
+        // autopopulate: true
+    }],
     slug: {
         type: String,
-        slug: "name"
+        slug: "name",
+        unique: true
     }
 });
+
+// parkSchema.plugin(autopopulate);
+
+// user schema methods
 
 userSchema.methods.isValidPassword = function(password) {
     return bcrypt.compare(password, this.password);
 };
 
+// coaster schema methods
+
+async function updateRating(cb) {
+    await this.set({ rating: this.calcRating() });
+}
+
 coasterSchema.methods.calcRating = function(cb) {
-    // TODO
+    if(this.reviews.length === 0) {
+        return "N/A";
+    } else {
+        return this.reviews.reduce((sum, r) => sum + r.rating, 0) / this.reviews.length;
+    }
 };
+
+coasterSchema.methods.updateRating = updateRating;
+
+// park schema methods
 
 parkSchema.methods.calcRating = function(cb) {
-    // TODO
+    let totalRating = 0;
+    let ratedCoasters = 0;
+    for(const c of this.coasters) {
+        const r = c.calcRating();
+        if(r !== "N/A" && r !== "None") {
+            totalRating += r;
+            ratedCoasters ++;
+        }
+    }
+
+    if(ratedCoasters > 0) {
+        return totalRating / ratedCoasters;
+    } else {
+        return "N/A";
+    }
 };
 
-/* TODO: add middleware for:
-User: salt and hash password
-Review: update coaster and park rating
-*/
+parkSchema.methods.updateRating = updateRating;
 
 // middleware for salting and hashing password
+
 userSchema.pre("save", async function() {
-    this.password = await bcrypt.hash(this.password, 10);
+    if(this.isNew) {
+        this.password = await bcrypt.hash(this.password, 10);
+    }
 });
+
+// middleware for population and updating ratings on find
+
+function getPopulator(toPopulate) {
+    return function(next) {
+        this.populate(toPopulate);
+        next();
+    }
+}
+
+function updateDocs(docs) {
+    for(const doc of docs) {
+        doc.updateRating();
+    }
+}
+
+reviewSchema.pre(["find", "findOne"], getPopulator("author"));
+coasterSchema.pre(["find", "findOne"], getPopulator("reviews"));
+coasterSchema.post("find", updateDocs);
+parkSchema.pre(["find", "findOne"], getPopulator("coasters"));
+parkSchema.post("find", updateDocs);
 
 const User = mongoose.model("User", userSchema);
 const Review = mongoose.model("Review", reviewSchema);

@@ -7,7 +7,7 @@ const passport = require("passport");
 const flash = require("connect-flash");
 
 // mongoose models
-// const { User, Review, Coaster, Park } = require("./db.js");
+const { User, Review, Coaster, Park } = require("./db.js");
 
 // app setup
 const app = express();
@@ -22,10 +22,31 @@ app.use(express.urlencoded({ extended: false }));
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(flash());
-require("./auth");
+const { isAdmin } = require("./auth");
+
+app.use((req, res, next) => {
+    console.log(req.url);
+    next();
+});
 
 app.get("/", (req, res) => {
-    res.render("index");
+    res.render("index", { errorMessage: req.flash("errorMessage") });
+});
+
+app.get("/parks", async (req, res) => {
+    try {
+        const parks = await Park.find();
+        res.render("parks", {
+            errorMessage: req.flash("errorMessage"),
+            successMessage: req.flash("successMessage"),
+            isAdmin: isAdmin(req),
+            parks: parks
+        });
+    } catch(err) {
+        console.log(err);
+        req.flash("errorMessage", "Could not display parks, please try again");
+        res.redirect("back");
+    }
 });
 
 app.get("/login", (req, res) => {
@@ -78,12 +99,69 @@ function checkAdmin(req, res, next) {
     if(req.isAuthenticated() && req.user.type === "admin") {
         next();
     } else {
-        // handle non-admin case
+        res.send("You must be logged in as an admin to take this action");
     }
 }
 
-app.get("...", checkAdmin, (req, res) => {
+app.post("/add-park", checkAdmin, async (req, res) => {
+    try {
+        await Park.create({ name: req.body.name });
+        req.flash("successMessage", "Successfully added park");
+    } catch(err) {
+        console.log(err);
+        req.flash("errorMessage", "Unable to add park, please try again");
+    }
+    res.redirect("back");
+});
 
+// routes with parameters
+
+app.post("/:park/add-coaster", checkAdmin, async (req, res) => {
+    try {
+        const coaster = await Coaster.create({ name: req.body.name });
+        await Park.findOneAndUpdate(
+            { slug: req.params.park },
+            { $push: {coasters: coaster._id} }
+        );
+        req.flash("successMessage", "Successfully added coaster");
+    } catch(err) {
+        console.log(err);
+        req.flash("errorMessage", "Unable to add coaster, please try again");
+    }
+    res.redirect("back");
+});
+
+app.get("/:park/:coaster", async (req, res) => {
+    try {
+        const park = await Park.findOne({ slug: req.params.park });
+        const coaster = park.coasters.find(c => c.slug === req.params.coaster);
+        res.render("coaster", {
+            errorMessage: req.flash("errorMessage"),
+            successMessage: req.flash("successMessage"),
+            isAdmin: isAdmin(req),
+            park: park,
+            coaster: coaster
+        });
+    } catch(err) {
+        console.log(err);
+        req.flash("errorMessage", "Could not display coaster info, please try again");
+        res.redirect("back");
+    }
+});
+
+app.get("/:park", async (req, res) => {
+    try {
+        const park = await Park.findOne({ slug: req.params.park });
+        res.render("park", {
+            errorMessage: req.flash("errorMessage"),
+            successMessage: req.flash("successMessage"),
+            isAdmin: isAdmin(req),
+            park: park,
+        });
+    } catch(err) {
+        req.flash("errorMessage", "Could not display park info, please try again");
+        res.redirect("/parks");
+    }
 });
 
 app.listen(3000);

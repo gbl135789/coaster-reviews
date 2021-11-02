@@ -1,0 +1,30 @@
+
+<h2>Parks</h2>
+
+{{#if errorMessage}}
+    <div class="alert alert-danger">{{errorMessage}}</div>
+{{/if}}
+
+{{#if successMessage}}
+    <div>{{successMessage}}</div>
+{{/if}}
+
+{{#if isAdmin}}
+    {{!-- <a href="/add-park">Add park</a> --}}
+    <form method="POST" action="/add-park">
+        <h3>Add a park:</h3>
+        <label for="name">Name</label><br>
+        <input id="name" name="name" type="text" required><br>
+        <input type="submit" value="Add park">
+    </form>
+{{/if}}
+
+<ul>
+    {{#each parks}}
+        <li>
+            <a href="/{{slug}}">{{name}}</a> Rating: {{rating}}
+        </li>
+    {{else}}
+        <li>No parks to display.</li>
+    {{/each}}
+</ul>

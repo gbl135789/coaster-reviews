@@ -1,0 +1,34 @@
+
+<h2>{{coaster.name}}</h2>
+
+<h3>Rating: {{coaster.rating}}</h3>
+
+{{#if isAuthenticated}}
+    <form method="POST" action="/{{coaster.slug}}/post-review">
+        <h3>Write a review</h3>
+
+        <label for="rating">Rating</label>
+        <select id="rating" name="rating">
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+        </select>
+        
+        <label for="body">Text</label>
+        <textarea id="body" name="body"></textarea>
+
+        <input type="submit" value="Submit">
+    </form>
+{{else}}
+    <p>Log in to write a review</p>
+{{/if}}
+
+<ul>
+    {{#each coaster.reviews}}
+        <li>{{body}}</li>
+    {{else}}
+        <li>No reviews to show</li>
+    {{/each}}
+</ul>

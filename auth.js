@@ -1,4 +1,7 @@
 
+// references used for integrating authentication:
+// http://www.passportjs.org/docs/
+
 const passport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
 
@@ -16,6 +19,16 @@ const messages = {
 
 Object.freeze(messages);
 
+passport.serializeUser((user, done) => {
+    done(null, user.id);
+  });
+  
+passport.deserializeUser((id, done) => {
+    User.findById(id, (err, user) => {
+        done(err, user);
+    });
+});
+
 // attempt to log in a user, catching errors other than username/password mismatch as needed
 async function handleLogin(req, username, password, done) {
     try {
@@ -29,18 +42,6 @@ async function handleLogin(req, username, password, done) {
         done(null, false, req.flash("errorMessage", messages.error.internal));
     }
 }
-
-passport.use("local-login", new LocalStrategy({ passReqToCallback: true }, handleLogin));
-
-passport.serializeUser(function(user, done) {
-    done(null, user.id);
-  });
-  
-passport.deserializeUser(function(id, done) {
-    User.findById(id, (err, user) => {
-        done(err, user);
-    });
-});
 
 function handleRegistrationError(err, req, done) {
     const errors = err.errors;
@@ -66,4 +67,15 @@ async function handleRegistration(req, username, password, done) {
     }
 }
 
+passport.use("local-login", new LocalStrategy({ passReqToCallback: true }, handleLogin));
 passport.use("local-register", new LocalStrategy({ passReqToCallback: true }, handleRegistration));
+
+// helper functions for authorizing based on authentication status
+
+function isAdmin(req) {
+    return req.isAuthenticated() && req.user.type === "admin";
+}
+
+module.exports = {
+    isAdmin
+}

@@ -8,3 +8,7 @@
 h1 {
     color: red;
 }
+
+form, input {
+    border: 1px solid black;
+}
