@@ -7,7 +7,7 @@ const passport = require("passport");
 const flash = require("connect-flash");
 
 // mongoose models
-const { User, Review, Coaster, Park } = require("./db.js");
+const db = require("./db.js");
 
 // app setup
 const app = express();
@@ -35,7 +35,7 @@ app.get("/", (req, res) => {
 
 app.get("/parks", async (req, res) => {
     try {
-        const parks = await Park.find();
+        const parks = await db.getParksWithRatings(await db.Park.find());
         res.render("parks", {
             errorMessage: req.flash("errorMessage"),
             successMessage: req.flash("successMessage"),
@@ -45,6 +45,21 @@ app.get("/parks", async (req, res) => {
     } catch(err) {
         console.log(err);
         req.flash("errorMessage", "Could not display parks, please try again");
+        res.redirect("back");
+    }
+});
+
+app.get("/coasters", async (req, res) => {
+    try {
+        const coasters = await db.getCoastersWithRatingsAndParks(await db.Coaster.find());
+        res.render("coasters", {
+            errorMessage: req.flash("errorMessage"),
+            successMessage: req.flash("successMessage"),
+            coasters: coasters
+        });
+    } catch(err) {
+        console.log(err);
+        req.flash("errorMessage", "Could not display coasters, please try again");
         res.redirect("back");
     }
 });
@@ -105,7 +120,7 @@ function checkAdmin(req, res, next) {
 
 app.post("/add-park", checkAdmin, async (req, res) => {
     try {
-        await Park.create({ name: req.body.name });
+        await db.Park.create({ name: req.body.name });
         req.flash("successMessage", "Successfully added park");
     } catch(err) {
         console.log(err);
@@ -118,8 +133,8 @@ app.post("/add-park", checkAdmin, async (req, res) => {
 
 app.post("/:park/add-coaster", checkAdmin, async (req, res) => {
     try {
-        const coaster = await Coaster.create({ name: req.body.name });
-        await Park.findOneAndUpdate(
+        const coaster = await db.Coaster.create({ name: req.body.name });
+        await db.Park.findOneAndUpdate(
             { slug: req.params.park },
             { $push: {coasters: coaster._id} }
         );
@@ -133,14 +148,14 @@ app.post("/:park/add-coaster", checkAdmin, async (req, res) => {
 
 app.get("/:park/:coaster", async (req, res) => {
     try {
-        const park = await Park.findOne({ slug: req.params.park });
+        const park = await db.Park.findOne({ slug: req.params.park });
         const coaster = park.coasters.find(c => c.slug === req.params.coaster);
         res.render("coaster", {
             errorMessage: req.flash("errorMessage"),
             successMessage: req.flash("successMessage"),
-            isAdmin: isAdmin(req),
+            isAuthenticated: req.isAuthenticated(),
             park: park,
-            coaster: coaster
+            coaster: await db.getCoasterWithRating(coaster)
         });
     } catch(err) {
         console.log(err);
@@ -151,14 +166,16 @@ app.get("/:park/:coaster", async (req, res) => {
 
 app.get("/:park", async (req, res) => {
     try {
-        const park = await Park.findOne({ slug: req.params.park });
+        const park = await db.Park.findOne({ slug: req.params.park });
         res.render("park", {
             errorMessage: req.flash("errorMessage"),
             successMessage: req.flash("successMessage"),
             isAdmin: isAdmin(req),
-            park: park,
+            park: await db.getParkWithRating(park),
+            coasters: await db.getCoastersWithRatings(park.coasters)
         });
     } catch(err) {
+        console.log(err);
         req.flash("errorMessage", "Could not display park info, please try again");
         res.redirect("/parks");
     }

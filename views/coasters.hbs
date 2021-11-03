@@ -1,0 +1,20 @@
+
+<h2>Coasters</h2>
+
+{{#if errorMessage}}
+    <div class="alert alert-danger">{{errorMessage}}</div>
+{{/if}}
+
+{{#if successMessage}}
+    <div>{{successMessage}}</div>
+{{/if}}
+
+<ul>
+    {{#each coasters}}
+        <li>
+            <a href="/{{park.slug}}/{{slug}}">{{name}}</a> Rating: {{rating}}
+        </li>
+    {{else}}
+        <li>No coasters to display.</li>
+    {{/each}}
+</ul>

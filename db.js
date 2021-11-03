@@ -48,7 +48,7 @@ const reviewSchema = mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
         required: true,
-        // autopopulate: true
+        autopopulate: true
     },
     postTime: Date,
     rating: {
@@ -73,14 +73,10 @@ const coasterSchema = mongoose.Schema({
         required: true,
         trim: true
     },
-    rating: {
-        type: String,
-        default: "None"
-    },
     reviews: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: "Review",
-        // autopopulate: true
+        autopopulate: true
     }],
     slug: {
         type: String,
@@ -99,14 +95,10 @@ const parkSchema = mongoose.Schema({
         required: true,
         trim: true
     },
-    rating: {
-        type: String,
-        default: "None"
-    },
     coasters: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: "Coaster",
-        // autopopulate: true
+        autopopulate: true
     }],
     slug: {
         type: String,
@@ -115,51 +107,13 @@ const parkSchema = mongoose.Schema({
     }
 });
 
-// parkSchema.plugin(autopopulate);
+parkSchema.plugin(autopopulate);
 
 // user schema methods
 
 userSchema.methods.isValidPassword = function(password) {
     return bcrypt.compare(password, this.password);
 };
-
-// coaster schema methods
-
-async function updateRating(cb) {
-    await this.set({ rating: this.calcRating() });
-}
-
-coasterSchema.methods.calcRating = function(cb) {
-    if(this.reviews.length === 0) {
-        return "N/A";
-    } else {
-        return this.reviews.reduce((sum, r) => sum + r.rating, 0) / this.reviews.length;
-    }
-};
-
-coasterSchema.methods.updateRating = updateRating;
-
-// park schema methods
-
-parkSchema.methods.calcRating = function(cb) {
-    let totalRating = 0;
-    let ratedCoasters = 0;
-    for(const c of this.coasters) {
-        const r = c.calcRating();
-        if(r !== "N/A" && r !== "None") {
-            totalRating += r;
-            ratedCoasters ++;
-        }
-    }
-
-    if(ratedCoasters > 0) {
-        return totalRating / ratedCoasters;
-    } else {
-        return "N/A";
-    }
-};
-
-parkSchema.methods.updateRating = updateRating;
 
 // middleware for salting and hashing password
 
@@ -169,26 +123,68 @@ userSchema.pre("save", async function() {
     }
 });
 
-// middleware for population and updating ratings on find
+// other helper functions
 
-function getPopulator(toPopulate) {
-    return function(next) {
-        this.populate(toPopulate);
-        next();
-    }
+function getCoasterPark(coaster) {
+    return Park.findOne({ coasters: coaster._id });
 }
 
-function updateDocs(docs) {
-    for(const doc of docs) {
-        doc.updateRating();
-    }
+function getCoasterRating(coaster) {
+    const reviews = coaster.reviews;
+    return reviews.length === 0 ? "N/A" : reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length;
 }
 
-reviewSchema.pre(["find", "findOne"], getPopulator("author"));
-coasterSchema.pre(["find", "findOne"], getPopulator("reviews"));
-coasterSchema.post("find", updateDocs);
-parkSchema.pre(["find", "findOne"], getPopulator("coasters"));
-parkSchema.post("find", updateDocs);
+async function getCoasterWithRating(coaster) {
+    const result = coaster.toObject();
+    result.rating = getCoasterRating(coaster);
+    return result;
+}
+
+async function getCoastersWithRatings(coasters) {
+    const result = [];
+    for(const c of coasters) {
+        result.push(await getCoasterWithRating(c));
+    }
+    return result;
+}
+
+async function getCoastersWithRatingsAndParks(coasters) {
+    const result = await getCoastersWithRatings(coasters);
+    for(const c of result) {
+        c.park = await getCoasterPark(c);
+    }
+    return result;
+}
+
+async function getParkRating(park) {
+    const coasters = park.coasters;
+
+    let totalRating = 0;
+    let ratedCoasters = 0;
+    for(const c of coasters) {
+        const r = getCoasterRating(c);
+        if(r !== "N/A") {
+            totalRating += r;
+            ratedCoasters++;
+        }
+    }
+
+    return ratedCoasters === 0 ? "N/A" : totalRating / ratedCoasters;
+}
+
+async function getParkWithRating(park) {
+    const result = park.toObject();
+    result.rating = await getParkRating(park);
+    return result;
+}
+
+async function getParksWithRatings(parks) {
+    const result = [];
+    for(const p of parks) {
+        result.push(await getParkWithRating(p));
+    }
+    return result;
+}
 
 const User = mongoose.model("User", userSchema);
 const Review = mongoose.model("Review", reviewSchema);
@@ -197,4 +193,16 @@ const Park = mongoose.model("Park", parkSchema);
 
 mongoose.connect("mongodb://localhost/final-project");
 
-module.exports = { User, Review, Coaster, Park };
+module.exports = {
+    User,
+    Review,
+    Coaster,
+    Park,
+    getCoasterRating,
+    getCoasterWithRating,
+    getCoastersWithRatings,
+    getCoastersWithRatingsAndParks,
+    getParkRating,
+    getParkWithRating,
+    getParksWithRatings
+};
