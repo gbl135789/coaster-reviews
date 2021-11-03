@@ -6,7 +6,7 @@ const session = require("express-session");
 const passport = require("passport");
 const flash = require("connect-flash");
 
-// mongoose models
+// mongoose models and helpers
 const db = require("./db.js");
 
 // app setup
@@ -24,48 +24,55 @@ app.use(passport.session());
 app.use(flash());
 const { isAdmin } = require("./auth");
 
-app.use((req, res, next) => {
-    console.log(req.url);
+app.use((req, _, next) => {
+    console.log("Request method:", req.method);
+    console.log("Request path:", req.path, "\n");
     next();
 });
+
+// decorator for async route handlers
+function getAsyncHandler(handler) {
+    return function(req, res, next) {
+        handler(req, res, next).catch(next);
+    };
+}
+
+// middleware for handling errors
+function errorHandler(err, req, res, _) {
+    console.log(req.method, req.path, "encountered an error:");
+    console.log(err, "\n");
+    req.flash("errorMessage", "An error occurred, please try again");
+    res.redirect("back");
+}
 
 app.get("/", (req, res) => {
     res.render("index", { errorMessage: req.flash("errorMessage") });
 });
 
-app.get("/parks", async (req, res) => {
-    try {
-        const parks = await db.getParksWithRatings(await db.Park.find());
-        res.render("parks", {
-            errorMessage: req.flash("errorMessage"),
-            successMessage: req.flash("successMessage"),
-            isAdmin: isAdmin(req),
-            parks: parks
-        });
-    } catch(err) {
-        console.log(err);
-        req.flash("errorMessage", "Could not display parks, please try again");
-        res.redirect("back");
-    }
-});
+app.get("/parks", getAsyncHandler(async (req, res) => {
+    const parks = await db.getParksWithRatings(await db.Park.find());
+    res.render("parks", {
+        errorMessage: req.flash("errorMessage"),
+        successMessage: req.flash("successMessage"),
+        isAdmin: isAdmin(req),
+        parks: parks
+    });
+}));
 
-app.get("/coasters", async (req, res) => {
-    try {
-        const coasters = await db.getCoastersWithRatingsAndParks(await db.Coaster.find());
-        res.render("coasters", {
-            errorMessage: req.flash("errorMessage"),
-            successMessage: req.flash("successMessage"),
-            coasters: coasters
-        });
-    } catch(err) {
-        console.log(err);
-        req.flash("errorMessage", "Could not display coasters, please try again");
-        res.redirect("back");
-    }
-});
+app.get("/coasters", getAsyncHandler(async (req, res) => {
+    const coasters = await db.getCoastersWithRatingsAndParks(await db.Coaster.find());
+    res.render("coasters", {
+        errorMessage: req.flash("errorMessage"),
+        successMessage: req.flash("successMessage"),
+        coasters: coasters
+    });
+}));
 
 app.get("/login", (req, res) => {
-    res.render("login", { errorMessage: req.flash("errorMessage") });
+    res.render("login", {
+        errorMessage: req.flash("errorMessage"),
+        successMessage: req.flash("successMessage")
+    });
 });
 
 app.post("/login", passport.authenticate("local-login", {
@@ -75,7 +82,10 @@ app.post("/login", passport.authenticate("local-login", {
 }));
 
 app.get("/register", (req, res) => {
-    res.render("register", { errorMessage: req.flash("errorMessage") });
+    res.render("register", {
+        errorMessage: req.flash("errorMessage"),
+        successMessage: req.flash("successMessage")
+    });
 });
 
 app.post("/register", passport.authenticate("local-register", {
@@ -97,14 +107,19 @@ function checkAuthenticated(req, res, next) {
 
 app.get("/account", (req, res) => {
     if(req.isAuthenticated()) {
-        res.render("account", { username: req.user.username });
+        res.render("account", {
+            errorMessage: req.flash("errorMessage"),
+            successMessage: req.flash("successMessage"),
+            username: req.user.username
+        });
     } else {
-        res.render("login");
+        res.redirect("/login");
     }
 });
 
 app.get("/logout", (req, res) => {
     req.logout();
+    req.flash("successMessage", "Successfully logged out");
     res.redirect("/login");
 });
 
@@ -118,67 +133,47 @@ function checkAdmin(req, res, next) {
     }
 }
 
-app.post("/add-park", checkAdmin, async (req, res) => {
-    try {
-        await db.Park.create({ name: req.body.name });
-        req.flash("successMessage", "Successfully added park");
-    } catch(err) {
-        console.log(err);
-        req.flash("errorMessage", "Unable to add park, please try again");
-    }
+app.post("/add-park", checkAdmin, getAsyncHandler(async (req, res) => {
+    await db.Park.create({ name: req.body.name });
+    req.flash("successMessage", "Successfully added park");
     res.redirect("back");
-});
+}));
 
 // routes with parameters
 
-app.post("/:park/add-coaster", checkAdmin, async (req, res) => {
-    try {
-        const coaster = await db.Coaster.create({ name: req.body.name });
-        await db.Park.findOneAndUpdate(
-            { slug: req.params.park },
-            { $push: {coasters: coaster._id} }
-        );
-        req.flash("successMessage", "Successfully added coaster");
-    } catch(err) {
-        console.log(err);
-        req.flash("errorMessage", "Unable to add coaster, please try again");
-    }
+app.post("/:park/add-coaster", checkAdmin, getAsyncHandler(async (req, res) => {
+    const coaster = await db.Coaster.create({ name: req.body.name });
+    await db.Park.findOneAndUpdate(
+        { slug: req.params.park },
+        { $push: {coasters: coaster._id} }
+    );
+    req.flash("successMessage", "Successfully added coaster");
     res.redirect("back");
-});
+}));
 
-app.get("/:park/:coaster", async (req, res) => {
-    try {
-        const park = await db.Park.findOne({ slug: req.params.park });
-        const coaster = park.coasters.find(c => c.slug === req.params.coaster);
-        res.render("coaster", {
-            errorMessage: req.flash("errorMessage"),
-            successMessage: req.flash("successMessage"),
-            isAuthenticated: req.isAuthenticated(),
-            park: park,
-            coaster: await db.getCoasterWithRating(coaster)
-        });
-    } catch(err) {
-        console.log(err);
-        req.flash("errorMessage", "Could not display coaster info, please try again");
-        res.redirect("back");
-    }
-});
+app.get("/:park/:coaster", getAsyncHandler(async (req, res) => {
+    const park = await db.Park.findOne({ slug: req.params.park });
+    const coaster = park.coasters.find(c => c.slug === req.params.coaster);
+    res.render("coaster", {
+        errorMessage: req.flash("errorMessage"),
+        successMessage: req.flash("successMessage"),
+        isAuthenticated: req.isAuthenticated(),
+        park: park,
+        coaster: await db.getCoasterWithRating(coaster)
+    });
+}));
 
-app.get("/:park", async (req, res) => {
-    try {
-        const park = await db.Park.findOne({ slug: req.params.park });
-        res.render("park", {
-            errorMessage: req.flash("errorMessage"),
-            successMessage: req.flash("successMessage"),
-            isAdmin: isAdmin(req),
-            park: await db.getParkWithRating(park),
-            coasters: await db.getCoastersWithRatings(park.coasters)
-        });
-    } catch(err) {
-        console.log(err);
-        req.flash("errorMessage", "Could not display park info, please try again");
-        res.redirect("/parks");
-    }
-});
+app.get("/:park", getAsyncHandler(async (req, res) => {
+    const park = await db.Park.findOne({ slug: req.params.park });
+    res.render("park", {
+        errorMessage: req.flash("errorMessage"),
+        successMessage: req.flash("successMessage"),
+        isAdmin: isAdmin(req),
+        park: await db.getParkWithRating(park),
+        coasters: await db.getCoastersWithRatings(park.coasters)
+    });
+}));
+
+app.use(errorHandler);
 
 app.listen(3000);

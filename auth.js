@@ -78,4 +78,4 @@ function isAdmin(req) {
 
 module.exports = {
     isAdmin
-}
+};

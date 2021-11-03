@@ -3,14 +3,6 @@
 
 <h3>Rating: {{park.rating}}</h3>
 
-{{#if errorMessage}}
-    <div class="alert alert-danger">{{errorMessage}}</div>
-{{/if}}
-
-{{#if successMessage}}
-    <div>{{successMessage}}</div>
-{{/if}}
-
 {{#if isAdmin}}
     {{!-- <a href="/{{park.slug}}/add-coaster">Add coaster</a> --}}
     <form method="POST" action="/{{park.slug}}/add-coaster">

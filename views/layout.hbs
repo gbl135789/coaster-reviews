@@ -21,6 +21,14 @@
                     <a href="/account">Account</a>
                 </nav>
             </header>
+
+            {{#if errorMessage}}
+                <div class="alert alert-danger">{{errorMessage}}</div>
+            {{/if}}
+
+            {{#if successMessage}}
+                <div>{{successMessage}}</div>
+            {{/if}}
             
             {{{ body }}}
         </div>

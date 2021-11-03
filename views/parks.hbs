@@ -1,14 +1,6 @@
 
 <h2>Parks</h2>
 
-{{#if errorMessage}}
-    <div class="alert alert-danger">{{errorMessage}}</div>
-{{/if}}
-
-{{#if successMessage}}
-    <div>{{successMessage}}</div>
-{{/if}}
-
 {{#if isAdmin}}
     {{!-- <a href="/add-park">Add park</a> --}}
     <form method="POST" action="/add-park">
