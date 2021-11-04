@@ -10,11 +10,12 @@ const flash = require("connect-flash");
 const db = require("./db.js");
 
 // app setup
+const config = require("./config/config");
 const app = express();
 app.set("view engine", "hbs");
 app.use(express.static(path.resolve(__dirname, "public")));
 app.use(session({
-    secret: "temp-secret", // TODO: configure secret
+    secret: config.get("sessionSecret"),
     resave: false,
     saveUninitialized: true
 }));
@@ -141,6 +142,7 @@ app.post("/add-park", checkAdmin, getAsyncHandler(async (req, res) => {
 
 // routes with parameters
 
+// TODO: add timestamp when creating review
 app.post("/:coaster/review", checkAuthenticated, getAsyncHandler(async (req, res) => {
     const review = await db.Review.create({
         author: req.user._id,
@@ -192,4 +194,4 @@ app.get("/:park", getAsyncHandler(async (req, res) => {
 
 app.use(errorHandler);
 
-app.listen(3000);
+app.listen(config.get("port"));

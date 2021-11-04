@@ -1,4 +1,5 @@
 
+const config = require("./config/config");
 const slugGenerator = require("mongoose-slug-generator");
 const uniqueValidator = require("mongoose-unique-validator");
 const autopopulate = require("mongoose-autopopulate");
@@ -195,7 +196,9 @@ const Review = mongoose.model("Review", reviewSchema);
 const Coaster = mongoose.model("Coaster", coasterSchema);
 const Park = mongoose.model("Park", parkSchema);
 
-mongoose.connect("mongodb://localhost/final-project");
+const creds = `${config.get("db.username")}:${config.get("db.password")}`;
+const cstring = `mongodb://${creds}@${config.get("db.host")}/${config.get("db.name")}`;
+mongoose.connect(cstring);
 
 module.exports = {
     User,
