@@ -63,6 +63,8 @@ const reviewSchema = mongoose.Schema({
     }
 });
 
+reviewSchema.plugin(autopopulate);
+
 /*
 -coasters have a name, a list of reviews, and a slug
 -the rating will be calculated by taking the average of the review ratings
@@ -84,6 +86,8 @@ const coasterSchema = mongoose.Schema({
         unique: true
     }
 });
+
+coasterSchema.plugin(autopopulate);
 
 /*
 -parks have a name, a list of reviews, and a slug

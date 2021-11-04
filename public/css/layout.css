@@ -1,0 +1,27 @@
+
+* {
+    margin: 0;
+    padding: 0;
+    border: 1px dotted black;
+}
+
+#root {
+    width: 75%;
+    margin: auto;
+}
+
+#siteHeader {
+    text-align: center;
+}
+
+.navLink {
+    margin-right: 30px;
+}
+
+.navLink:last-child {
+    margin-right: 0;
+}
+
+/* form, form > input, form > textarea {
+    border: 1px solid black;
+} */

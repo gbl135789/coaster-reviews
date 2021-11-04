@@ -5,29 +5,35 @@
     <head>
         <title>Coaster Reviews</title>
         <meta charset="utf-8">
-        <link rel="stylesheet" href="/css/main.css">
+        <link rel="stylesheet" href="/css/layout.css">
+        <link rel="stylesheet" href="/css/fonts.css">
+        <link rel="stylesheet" href="/css/styles.css">
     </head>
 
     <body>
         <div id="root">
-            <header>
-                <a href="/">
-                    <h1>Coaster Reviews</h1>
-                </a>
+            <header id="siteHeader">
+                <h1 id="siteTitle">
+                    <a href="/">Coaster Reviews</a>
+                </h1>
 
-                <nav>
-                    <a href="/parks">Parks</a>
-                    <a href="/coasters">Coasters</a>
-                    <a href="/account">Account</a>
+                <nav id="siteNav">
+                    <a class="navLink" href="/parks">Parks</a>
+                    <a class="navLink" href="/coasters">Coasters</a>
+                    <a class="navLink" href="/account">Account</a>
                 </nav>
             </header>
 
             {{#if errorMessage}}
-                <div class="alert alert-danger">{{errorMessage}}</div>
+                <div class="errorMessage">
+                    <p>{{errorMessage}}</p>
+                </div>
             {{/if}}
 
             {{#if successMessage}}
-                <div>{{successMessage}}</div>
+                <div class="successMessage">
+                    <p>{{successMessage}}</p>
+                </div>
             {{/if}}
             
             {{{ body }}}

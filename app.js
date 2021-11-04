@@ -141,6 +141,20 @@ app.post("/add-park", checkAdmin, getAsyncHandler(async (req, res) => {
 
 // routes with parameters
 
+app.post("/:coaster/review", checkAuthenticated, getAsyncHandler(async (req, res) => {
+    const review = await db.Review.create({
+        author: req.user._id,
+        rating: req.body.rating,
+        body: req.body.body
+    });
+    await db.Coaster.findOneAndUpdate(
+        { slug: req.params.coaster },
+        { $push: {reviews: review._id} }
+    );
+    req.flash("successMessage", "Successfully posted review");
+    res.redirect("back");
+}));
+
 app.post("/:park/add-coaster", checkAdmin, getAsyncHandler(async (req, res) => {
     const coaster = await db.Coaster.create({ name: req.body.name });
     await db.Park.findOneAndUpdate(
@@ -154,10 +168,12 @@ app.post("/:park/add-coaster", checkAdmin, getAsyncHandler(async (req, res) => {
 app.get("/:park/:coaster", getAsyncHandler(async (req, res) => {
     const park = await db.Park.findOne({ slug: req.params.park });
     const coaster = park.coasters.find(c => c.slug === req.params.coaster);
+    const isAuthenticated = req.isAuthenticated();
     res.render("coaster", {
         errorMessage: req.flash("errorMessage"),
         successMessage: req.flash("successMessage"),
-        isAuthenticated: req.isAuthenticated(),
+        isAuthenticated: isAuthenticated,
+        hasNotWritten: isAuthenticated && !coaster.reviews.find(r => r.author.username === req.user.username),
         park: park,
         coaster: await db.getCoasterWithRating(coaster)
     });

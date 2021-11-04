@@ -1,0 +1,26 @@
+
+.errorMessage {
+    background-color: rgba(255, 0, 0, 0.3);
+}
+
+.successMessage {
+    background-color: rgba(0, 255, 0, 0.3);
+    opacity: 0.5;
+}
+
+ul {
+    list-style: none;
+}
+
+a {
+    color: navy;
+    text-decoration: none;
+}
+
+a:hover {
+    color: gray;
+}
+
+a:visited {
+    color: navy;
+}
