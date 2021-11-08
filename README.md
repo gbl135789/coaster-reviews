@@ -107,20 +107,23 @@ Common header:
 
 ## Research Topics
 
-* (4 points, estimated) Front end framework
-  * Candidates: React, Vue, Angular
-  * These frameworks provide powerful methods for creating and managing user interfaces. I will use a framework to handle site presentation and user interactivity such as sorting, filtering, posting/deleting reviews, etc.
+* (3 points) Authentication
+  * Candidates: Passport
+  * In order to support user accounts and role based authorization, There needs to be a way to securely store and retrieve sensitive user information. I will use Passport to integrate username/password authentication in the app.
 * (3 points) Configuration management
   * Candidates: nconf, Node convict
   * It is often the case that the app's behavior needs to be modified to suit its production environment, such as disabling logging and connecting to different databases. I will use a library to help me manage development and production configurations.
-* (2 points) Authentication
-  * Candidates: Passport
-  * In order to support user accounts and role based authorization, There needs to be a way to securely store and retrieve sensitive user information. I will use Passport to integrate username/password authentication in the app.
-* (1 point, estimated) Slug generation for routing
+* (1 point) Slug generation for routing
   * Candidates: Mongoose slug generator, slugify
   * The site will potentially have many parks and coasters. It would be convenient to automatically generate a slug whenever a new park or coaster is added. I will use a library to generate slugs for each new park and coaster.
+* (1 point) Messages displayed on redirect
+  * Candidates: Connect flash
+  * When browsing a website, various errors may occur. It would be helpful to the user to know whether or not a redirect heppened due to an error. I will use a library to help me store and retrieve appropriate messages upon each redirect.
+* (4 points, estimated) Front end framework (time permitting)
+  * Candidates: React, Vue, Angular
+  * These frameworks provide powerful methods for creating and managing user interfaces. I will use a framework to handle site presentation and user interactivity such as sorting, filtering, posting/deleting reviews, etc.
 
-Total points: 10
+Total points: 8 (12 if time permitting)
 
 
 ## [Link to Initial Main Project File](app.js) 
@@ -128,7 +131,24 @@ Total points: 10
 
 ## Annotations / References Used
 
-1. [docs on React](https://reactjs.org/docs/getting-started.html) - (add link to source code that was based on this)
-2. [docs on Node convict](https://www.npmjs.com/package/convict) - (add link to source code that was based on this)
-3. [docs on Passport](http://www.passportjs.org/docs/) - (add link to source code that was based on this)
-4. [docs on Mongoose slug generator](https://www.npmjs.com/package/mongoose-slug-generator) - (add link to source code that was based on this)
+### Research topics
+
+1. [docs on Passport](http://www.passportjs.org/docs/)
+  * [source code 1](https://github.com/nyu-csci-ua-0467-001-fall-2021/gbl254-final-project/blob/9971f39938248aaef7829707f40f2f7dd366a367/auth.js#L22-L30)
+  * [source code 2](https://github.com/nyu-csci-ua-0467-001-fall-2021/gbl254-final-project/blob/9971f39938248aaef7829707f40f2f7dd366a367/auth.js#L70-L71)
+2. [docs on Node convict](https://www.npmjs.com/package/convict)
+3. [docs on Mongoose slug generator](https://www.npmjs.com/package/mongoose-slug-generator)
+  * [source code 1](https://github.com/nyu-csci-ua-0467-001-fall-2021/gbl254-final-project/blob/9971f39938248aaef7829707f40f2f7dd366a367/db.js#L7)
+  * [source code 2](https://github.com/nyu-csci-ua-0467-001-fall-2021/gbl254-final-project/blob/9971f39938248aaef7829707f40f2f7dd366a367/db.js#L84-L88)
+4. [docs on Connect flash](https://www.npmjs.com/package/connect-flash)
+  * [source code 1](https://github.com/nyu-csci-ua-0467-001-fall-2021/gbl254-final-project/blob/9971f39938248aaef7829707f40f2f7dd366a367/app.js#L45)
+  * [source code 2](https://github.com/nyu-csci-ua-0467-001-fall-2021/gbl254-final-project/blob/9971f39938248aaef7829707f40f2f7dd366a367/app.js#L56)
+
+### Other
+
+1. [docs on Mongoose unique validator](https://www.npmjs.com/package/mongoose-unique-validator)
+  * [source code 1](https://github.com/nyu-csci-ua-0467-001-fall-2021/gbl254-final-project/blob/9971f39938248aaef7829707f40f2f7dd366a367/db.js#L30)
+  * [source code 2](https://github.com/nyu-csci-ua-0467-001-fall-2021/gbl254-final-project/blob/9971f39938248aaef7829707f40f2f7dd366a367/db.js#L41)
+2. [docs on Mongoose autopopulate](https://www.npmjs.com/package/mongoose-autopopulate)
+  * [source code 1](https://github.com/nyu-csci-ua-0467-001-fall-2021/gbl254-final-project/blob/9971f39938248aaef7829707f40f2f7dd366a367/db.js#L52)
+  * [source code 2](https://github.com/nyu-csci-ua-0467-001-fall-2021/gbl254-final-project/blob/9971f39938248aaef7829707f40f2f7dd366a367/db.js#L67)
