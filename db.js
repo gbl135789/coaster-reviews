@@ -100,6 +100,11 @@ const parkSchema = mongoose.Schema({
         required: true,
         trim: true
     },
+    location: {
+        type: String,
+        required: true,
+        trim: true
+    },
     coasters: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: "Coaster",
@@ -196,8 +201,9 @@ const Review = mongoose.model("Review", reviewSchema);
 const Coaster = mongoose.model("Coaster", coasterSchema);
 const Park = mongoose.model("Park", parkSchema);
 
-const creds = `${config.get("db.username")}:${config.get("db.password")}`;
-const cstring = `mongodb://${creds}@${config.get("db.host")}/${config.get("db.name")}`;
+const creds = config.get("db.username") === "" ? "" : `${config.get("db.username")}:${config.get("db.password")}`;
+const host = creds === "" ? config.get("db.host") : `${creds}@${config.get("db.host")}`;
+const cstring = `mongodb://${host}/${config.get("db.name")}`;
 mongoose.connect(cstring);
 
 module.exports = {

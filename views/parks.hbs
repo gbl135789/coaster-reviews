@@ -7,6 +7,8 @@
         <h3>Add a park:</h3>
         <label for="name">Name</label><br>
         <input id="name" name="name" type="text" required><br>
+        <label for="location">Location</label><br>
+        <input id="location" name="location" type="text" required><br>
         <input type="submit" value="Add park">
     </form>
 {{/if}}
@@ -14,7 +16,8 @@
 <ul>
     {{#each parks}}
         <li>
-            <a href="/{{slug}}">{{name}}</a> Rating: {{rating}}
+            <a href="/{{slug}}">{{name}}</a> - {{location}}<br>
+            Rating: {{rating}}
         </li>
     {{else}}
         <li>No parks to display.</li>

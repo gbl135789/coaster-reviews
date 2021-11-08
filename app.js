@@ -135,7 +135,7 @@ function checkAdmin(req, res, next) {
 }
 
 app.post("/add-park", checkAdmin, getAsyncHandler(async (req, res) => {
-    await db.Park.create({ name: req.body.name });
+    await db.Park.create({ name: req.body.name, location: req.body.location });
     req.flash("successMessage", "Successfully added park");
     res.redirect("back");
 }));

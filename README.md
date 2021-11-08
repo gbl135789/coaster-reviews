@@ -37,7 +37,8 @@ Sample Coaster:
 ```javascript
 {
   name: “Superman The Ride”,
-  reviews: // a list of Review subdocuments
+  reviews: // a list of references to Review documents
+  slug: // a unique slug
 }
 ```
 
@@ -46,7 +47,9 @@ Sample Park:
 ```javascript
 {
   name: “Six Flags New England”,
-  coasters: // a list of Coaster subdocuments
+  location: "Agawam, Massachusetts, USA",
+  coasters: // a list of references to Coaster documents
+  slug: // a unique slug
 }
 ```
 
@@ -136,6 +139,7 @@ Total points: 8 (12 if time permitting)
 1. [docs on Passport](http://www.passportjs.org/docs/)
   * [source code 1](https://github.com/nyu-csci-ua-0467-001-fall-2021/gbl254-final-project/blob/9971f39938248aaef7829707f40f2f7dd366a367/auth.js#L22-L30)
   * [source code 2](https://github.com/nyu-csci-ua-0467-001-fall-2021/gbl254-final-project/blob/9971f39938248aaef7829707f40f2f7dd366a367/auth.js#L70-L71)
+  * [source code 3](https://github.com/nyu-csci-ua-0467-001-fall-2021/gbl254-final-project/blob/66e9ef20cc412da91303338da8ac15a08eb72302/app.js#L79-L83)
 2. [docs on Node convict](https://www.npmjs.com/package/convict)
 3. [docs on Mongoose slug generator](https://www.npmjs.com/package/mongoose-slug-generator)
   * [source code 1](https://github.com/nyu-csci-ua-0467-001-fall-2021/gbl254-final-project/blob/9971f39938248aaef7829707f40f2f7dd366a367/db.js#L7)
