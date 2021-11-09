@@ -141,7 +141,7 @@ function getCoasterPark(coaster) {
 
 function getCoasterRating(coaster) {
     const reviews = coaster.reviews;
-    return reviews.length === 0 ? "N/A" : reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length;
+    return reviews.length === 0 ? "N/A" : (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(2);
 }
 
 async function getCoasterWithRating(coaster) {
@@ -179,7 +179,7 @@ async function getParkRating(park) {
         }
     }
 
-    return ratedCoasters === 0 ? "N/A" : totalRating / ratedCoasters;
+    return ratedCoasters === 0 ? "N/A" : (totalRating / ratedCoasters).toFixed(2);
 }
 
 async function getParkWithRating(park) {

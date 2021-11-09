@@ -1,7 +1,7 @@
 
-<h2>{{coaster.name}}</h2>
+<h2>{{coaster.name}} - <a href="/{{park.slug}}">{{park.name}}</a></h2>
 
-<h3>Rating: {{coaster.rating}}</h3>
+<h3>Rating: &#9733;{{coaster.rating}}</h3>
 
 {{#if isAuthenticated}}
     {{#if hasNotWritten}}
@@ -34,7 +34,7 @@
         <li>
             <div class="review">
                 <div class="reviewHeader">
-                    {{author.username}} {{rating}}
+                    {{author.username}} &#9733;{{rating}}
                 </div>
                 {{body}}
             </div>

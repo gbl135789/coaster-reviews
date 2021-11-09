@@ -1,6 +1,13 @@
 
 <form method="POST" action="/register">
-    <input name="username" type="text" placeholder="username (5 to 30 characters)" required>
-    <input name="password" type="password" placeholder="password (5 to 30 characters)" required>
+    <label for="username">Username (5 to 30 characters)</label><br>
+    <input id="username" name="username" type="text" required><br>
+
+    <label for="password">Password (5 to 30 characters)</label><br>
+    <input id="password" name="password" type="password" required><br>
+
+    <label for="confirmPassword">Confirm password</label><br>
+    <input id="confirmPassword" name="confirmPassword" type="password" required><br>
+
     <input type="submit" value="Register">
 </form>

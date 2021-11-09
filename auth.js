@@ -12,6 +12,7 @@ const messages = {
         usernameRegisInvalid: "Username must be between 5 and 30 characters with no spaces",
         usernameRegisTaken: "Username already exists",
         passwordRegis: "Password must be between 5 and 30 characters with no spaces",
+        passwordRegisMatch: "Password and confirmed password must match",
         login: "Incorrect username or password",
         internal: "Internal error, please try again"
     }
@@ -60,8 +61,12 @@ function handleRegistrationError(err, req, done) {
 // password hashing is handled by Mongoose pre-save middleware
 async function handleRegistration(req, username, password, done) {
     try {
-        const user = await User.create({ type: "user", username: username, password: password });
-        done(null, user);
+        if(password !== req.body.confirmPassword) {
+            done(null, false, req.flash("errorMessage", messages.error.passwordRegisMatch));
+        } else {
+            const user = await User.create({ type: "user", username: username, password: password });
+            done(null, user);
+        }
     } catch(err) {
         handleRegistrationError(err, req, done);
     }

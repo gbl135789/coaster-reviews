@@ -4,7 +4,8 @@
 <ul>
     {{#each coasters}}
         <li>
-            <a href="/{{park.slug}}/{{slug}}">{{name}}</a> Rating: {{rating}}
+            <a href="/{{park.slug}}/{{slug}}">{{name}}</a> - <a href="/{{park.slug}}">{{park.name}}</a><br>
+            Rating: &#9733;{{rating}}
         </li>
     {{else}}
         <li>No coasters to display.</li>
