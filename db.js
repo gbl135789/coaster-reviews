@@ -144,37 +144,35 @@ function getCoasterRating(coaster) {
     return reviews.length === 0 ? "N/A" : (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(2);
 }
 
-async function getCoasterWithRating(coaster) {
+function getCoasterWithRating(coaster) {
     const result = coaster.toObject();
     result.rating = getCoasterRating(coaster);
     return result;
 }
 
-async function getCoastersWithRatings(coasters) {
+function getCoastersWithRatings(coasters) {
     const result = [];
     for(const c of coasters) {
-        result.push(await getCoasterWithRating(c));
+        result.push(getCoasterWithRating(c));
     }
     return result;
 }
 
 async function getCoastersWithRatingsAndParks(coasters) {
-    const result = await getCoastersWithRatings(coasters);
+    const result = getCoastersWithRatings(coasters);
     for(const c of result) {
         c.park = await getCoasterPark(c);
     }
     return result;
 }
 
-async function getParkRating(park) {
-    const coasters = park.coasters;
-
+function getParkRating(park) {
     let totalRating = 0;
     let ratedCoasters = 0;
-    for(const c of coasters) {
+    for(const c of park.coasters) {
         const r = getCoasterRating(c);
         if(r !== "N/A") {
-            totalRating += r;
+            totalRating += parseFloat(r);
             ratedCoasters++;
         }
     }
@@ -182,16 +180,16 @@ async function getParkRating(park) {
     return ratedCoasters === 0 ? "N/A" : (totalRating / ratedCoasters).toFixed(2);
 }
 
-async function getParkWithRating(park) {
+function getParkWithRating(park) {
     const result = park.toObject();
-    result.rating = await getParkRating(park);
+    result.rating = getParkRating(park);
     return result;
 }
 
 async function getParksWithRatings(parks) {
     const result = [];
     for(const p of parks) {
-        result.push(await getParkWithRating(p));
+        result.push(getParkWithRating(p));
     }
     return result;
 }

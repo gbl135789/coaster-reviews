@@ -1,8 +1,8 @@
 
 * {
     margin: 0;
-    padding: 0;
-    border: 1px dotted black;
+    padding: 5px 0px 5px 0px;
+    /* border: 1px dotted black; */
 }
 
 #root {
@@ -20,6 +20,11 @@
 
 .navLink:last-child {
     margin-right: 0;
+}
+
+.errorMessage, .successMessage {
+    padding-left: 5px;
+    padding-right: 5px;
 }
 
 /* form, form > input, form > textarea {

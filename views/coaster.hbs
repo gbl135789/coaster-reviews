@@ -6,7 +6,7 @@
 {{#if isAuthenticated}}
     {{#if hasNotWritten}}
         <form method="POST" action="/{{coaster.slug}}/review">
-            <h3>Write a review</h3>
+            <h3>Write a review:</h3>
 
             <label for="rating">Rating</label><br>
             <select id="rating" name="rating">
@@ -28,6 +28,8 @@
 {{else}}
     <p>Log in to write a review</p>
 {{/if}}
+
+<h3>Reviews:</h3>
 
 <ul>
     {{#each coaster.reviews}}
