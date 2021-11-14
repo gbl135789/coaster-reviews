@@ -5,7 +5,7 @@
 const passport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
 
-const { User } = require("./db");
+const db = require("./db");
 
 const messages = {
     error: {
@@ -25,15 +25,15 @@ passport.serializeUser((user, done) => {
   });
   
 passport.deserializeUser((id, done) => {
-    User.findById(id, (err, user) => {
-        done(err, user);
-    });
+    db.findById("User", id)
+      .then(u => done(null, u))
+      .catch(done);
 });
 
 // attempt to log in a user, catching errors other than username/password mismatch as needed
 async function handleLogin(req, username, password, done) {
     try {
-        const user = await User.findOne({ username: username });
+        const user = await db.findOne("User", { username: username });
         if(!user || !(await user.isValidPassword(password))) {
             done(null, false, req.flash("errorMessage", messages.error.login));
         } else {
@@ -64,7 +64,7 @@ async function handleRegistration(req, username, password, done) {
         if(password !== req.body.confirmPassword) {
             done(null, false, req.flash("errorMessage", messages.error.passwordRegisMatch));
         } else {
-            const user = await User.create({ type: "user", username: username, password: password });
+            const user = await db.create("User", { type: "user", username: username, password: password });
             done(null, user);
         }
     } catch(err) {
@@ -75,12 +75,36 @@ async function handleRegistration(req, username, password, done) {
 passport.use("local-login", new LocalStrategy({ passReqToCallback: true }, handleLogin));
 passport.use("local-register", new LocalStrategy({ passReqToCallback: true }, handleRegistration));
 
-// helper functions for authorizing based on authentication status
+// helper functions/middleware for authorizing based on authentication status
+
+function isAuthenticated(req) {
+    return req.isAuthenticated();
+}
+
+function checkAuthenticated(req, res, next) {
+    if(isAuthenticated(req)) {
+        next();
+    } else {
+        req.flash("errorMessage", "Please log in to perform this action");
+        res.redirect("/login");
+    }
+}
 
 function isAdmin(req) {
-    return req.isAuthenticated() && req.user.type === "admin";
+    return isAuthenticated(req) && req.user.type === "admin";
+}
+
+function checkAdmin(req, res, next) {
+    if(isAdmin(req)) {
+        next();
+    } else {
+        res.send("You must be logged in as an admin to take this action");
+    }
 }
 
 module.exports = {
-    isAdmin
+    isAuthenticated,
+    checkAuthenticated,
+    isAdmin,
+    checkAdmin,
 };

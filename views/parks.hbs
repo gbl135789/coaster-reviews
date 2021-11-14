@@ -17,7 +17,12 @@
     {{#each parks}}
         <li>
             <a href="/{{slug}}">{{name}}</a> - {{location}}<br>
-            Rating: &#9733;{{rating}}
+            Rating: &#9733;{{rating}}<br>
+            {{#if deletable}}
+                <form method="POST" action="/{{slug}}/delete-park">
+                    <input type="submit" value="Delete">
+                </form>
+            {{/if}}
         </li>
     {{else}}
         <li>No parks to display.</li>

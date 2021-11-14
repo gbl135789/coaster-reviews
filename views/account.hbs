@@ -1,10 +1,26 @@
 
 <h2>Account</h2>
 
+<h3>Logged in as: {{username}}</h3>
+
 <a href="/logout">Logout</a>
 
-<h3>Username: {{username}}</h3>
+<h3>My Reviews:</h3>
 
-<h3>Reviews:</h3>
-
-{{!-- {{#each reviews}} --}}
+<ul>
+    {{#each reviews}}
+        <li>
+            <div class="review">
+                <div class="reviewHeader">
+                    {{coaster.name}} &#9733;{{rating}} ({{postDate}} at {{postTime}})
+                </div>
+                {{body}}<br>
+                <form method="POST" action="/{{slug}}/delete-review">
+                    <input type="submit" value="Delete">
+                </form>
+            </div>
+        </li>
+    {{else}}
+        <li>No reviews to display</li>
+    {{/each}}
+</ul>

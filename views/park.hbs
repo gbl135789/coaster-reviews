@@ -19,9 +19,14 @@
     {{#each coasters}}
         <li>
             <a href="/{{../park.slug}}/{{slug}}">{{name}}</a><br>
-            Rating: &#9733;{{rating}}
+            Rating: &#9733;{{rating}}<br>
+            {{#if deletable}}
+                <form method="POST" action="/{{slug}}/delete-coaster">
+                    <input type="submit" value="Delete">
+                </form>
+            {{/if}}
         </li>
     {{else}}
-        <li>No coasters to display.</li>
+        <li>No coasters to display</li>
     {{/each}}
 </ul>

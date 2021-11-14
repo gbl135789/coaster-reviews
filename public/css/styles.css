@@ -7,8 +7,16 @@
     background-color: rgba(0, 255, 0, 0.3);
 }
 
+h2 {
+    background-color: gainsboro;
+}
+
 ul {
     list-style: none;
+}
+
+li:nth-child(odd) {
+    background-color:cornsilk;
 }
 
 a {

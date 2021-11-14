@@ -5,7 +5,7 @@
 
 {{#if isAuthenticated}}
     {{#if hasNotWritten}}
-        <form method="POST" action="/{{coaster.slug}}/review">
+        <form method="POST" action="/{{coaster.slug}}/post-review">
             <h3>Write a review:</h3>
 
             <label for="rating">Rating</label><br>
@@ -36,12 +36,17 @@
         <li>
             <div class="review">
                 <div class="reviewHeader">
-                    {{author.username}} &#9733;{{rating}}
+                    {{author.username}} &#9733;{{rating}} ({{postDate}} at {{postTime}})
                 </div>
-                {{body}}
+                {{body}}<br>
+                {{#if deletable}}
+                    <form method="POST" action="/{{slug}}/delete-review">
+                        <input type="submit" value="Delete">
+                    </form>
+                {{/if}}
             </div>
         </li>
     {{else}}
-        <li>No reviews to show</li>
+        <li>No reviews to display</li>
     {{/each}}
 </ul>

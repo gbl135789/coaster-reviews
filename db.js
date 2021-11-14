@@ -51,7 +51,14 @@ const reviewSchema = mongoose.Schema({
         required: true,
         autopopulate: true
     },
-    postTime: Date,
+    postDate: {
+        type: String,
+        required: true
+    },
+    postTime: {
+        type: String,
+        required: true
+    },
     rating: {
         type: Number,
         required: true,
@@ -61,6 +68,11 @@ const reviewSchema = mongoose.Schema({
     body: {
         type: String,
         required: true
+    },
+    slug: {
+        type: String,
+        slug: "author",
+        unique: true
     }
 });
 
@@ -79,7 +91,6 @@ const coasterSchema = mongoose.Schema({
     reviews: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: "Review",
-        autopopulate: true
     }],
     slug: {
         type: String,
@@ -87,8 +98,6 @@ const coasterSchema = mongoose.Schema({
         unique: true
     }
 });
-
-coasterSchema.plugin(autopopulate);
 
 /*
 -parks have a name, a list of reviews, and a slug
@@ -108,7 +117,6 @@ const parkSchema = mongoose.Schema({
     coasters: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: "Coaster",
-        autopopulate: true
     }],
     slug: {
         type: String,
@@ -117,12 +125,34 @@ const parkSchema = mongoose.Schema({
     }
 });
 
-parkSchema.plugin(autopopulate);
-
 // user schema methods
 
 userSchema.methods.isValidPassword = function(password) {
     return bcrypt.compare(password, this.password);
+};
+
+// coaster schema methods
+
+coasterSchema.methods.getRating = async function() {
+    const reviews = await find("Review", { _id: {$in: this.reviews} });
+    return reviews.length === 0 ? "N/A" : (reviews.reduce((sum, r) => sum + r.rating, 0.0) / reviews.length).toFixed(2);
+};
+
+// park schema methods
+
+parkSchema.methods.getRating = async function() {
+    const coasters = await find("Coaster", { _id: {$in: this.coasters} });
+    let totalRating = 0;
+    let ratedCoasters = 0;
+    for(const c of coasters) {
+        const r = await c.getRating();
+        if(r !== "N/A") {
+            totalRating += parseFloat(r);
+            ratedCoasters++;
+        }
+    }
+
+    return ratedCoasters === 0 ? "N/A" : (totalRating / ratedCoasters).toFixed(2);
 };
 
 // middleware for salting and hashing password
@@ -133,71 +163,83 @@ userSchema.pre("save", async function() {
     }
 });
 
-// other helper functions
-
-function getCoasterPark(coaster) {
-    return Park.findOne({ coasters: coaster._id });
-}
-
-function getCoasterRating(coaster) {
-    const reviews = coaster.reviews;
-    return reviews.length === 0 ? "N/A" : (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(2);
-}
-
-function getCoasterWithRating(coaster) {
-    const result = coaster.toObject();
-    result.rating = getCoasterRating(coaster);
-    return result;
-}
-
-function getCoastersWithRatings(coasters) {
-    const result = [];
-    for(const c of coasters) {
-        result.push(getCoasterWithRating(c));
-    }
-    return result;
-}
-
-async function getCoastersWithRatingsAndParks(coasters) {
-    const result = getCoastersWithRatings(coasters);
-    for(const c of result) {
-        c.park = await getCoasterPark(c);
-    }
-    return result;
-}
-
-function getParkRating(park) {
-    let totalRating = 0;
-    let ratedCoasters = 0;
-    for(const c of park.coasters) {
-        const r = getCoasterRating(c);
-        if(r !== "N/A") {
-            totalRating += parseFloat(r);
-            ratedCoasters++;
-        }
-    }
-
-    return ratedCoasters === 0 ? "N/A" : (totalRating / ratedCoasters).toFixed(2);
-}
-
-function getParkWithRating(park) {
-    const result = park.toObject();
-    result.rating = getParkRating(park);
-    return result;
-}
-
-async function getParksWithRatings(parks) {
-    const result = [];
-    for(const p of parks) {
-        result.push(getParkWithRating(p));
-    }
-    return result;
-}
-
 const User = mongoose.model("User", userSchema);
 const Review = mongoose.model("Review", reviewSchema);
 const Coaster = mongoose.model("Coaster", coasterSchema);
 const Park = mongoose.model("Park", parkSchema);
+
+// db api
+
+const opsTable = {
+    create: (model, args) => model.create(...args),
+    find: (model, args) => model.find(...args),
+    findOne: (model, args) => model.findOne(...args),
+    findById: (model, args) => model.findById(...args),
+    findOneAndUpdate: (model, args) => model.findOneAndUpdate(...args),
+    deleteOne: (model, args) => model.deleteOne(...args),
+    deleteMany: (model, args) => model.deleteMany(...args)
+};
+
+Object.freeze(opsTable);
+
+function dispatchOnModel(model, op, ...args) {
+    switch(model) {
+        case "User":
+            return opsTable[op](User, args);
+        case "Review":
+            return opsTable[op](Review, args);
+        case "Coaster":
+            return opsTable[op](Coaster, args);
+        case "Park":
+            return opsTable[op](Park, args);
+        default:
+            throw new Error("Unknown model: " + model);
+    }
+}
+
+function create(model, obj) {
+    return dispatchOnModel(model, "create", obj);
+}
+
+function find(model, query) {
+    return dispatchOnModel(model, "find", query);
+}
+
+function findOne(model, query) {
+    return dispatchOnModel(model, "findOne", query);
+}
+
+function findById(model, id) {
+    return dispatchOnModel(model, "findById", id);
+}
+
+function findOneAndUpdate(model, search, update) {
+    return dispatchOnModel(model, "findOneAndUpdate", search, update);
+}
+
+function deleteOne(model, query) {
+    return dispatchOnModel(model, "deleteOne", query);
+}
+
+function deleteMany(model, query) {
+    return dispatchOnModel(model, "deleteMany", query);
+}
+
+async function deleteCoaster(query) {
+    const coaster = await findOne("Coaster", query);
+    if(coaster) {
+        await deleteMany("Review", { _id: {$in: coaster.reviews} });
+        await deleteOne("Coaster", coaster);
+    }
+}
+
+async function deletePark(query) {
+    const park = await findOne("Park", query);
+    if(park) {
+        await Promise.all(park.coasters.map(async c => deleteCoaster({ _id: c })));
+        await deleteOne("Park", park);
+    }
+}
 
 const creds = config.get("db.username") === "" ? "" : `${config.get("db.username")}:${config.get("db.password")}`;
 const host = creds === "" ? config.get("db.host") : `${creds}@${config.get("db.host")}`;
@@ -205,15 +247,13 @@ const cstring = `mongodb://${host}/${config.get("db.name")}`;
 mongoose.connect(cstring);
 
 module.exports = {
-    User,
-    Review,
-    Coaster,
-    Park,
-    getCoasterRating,
-    getCoasterWithRating,
-    getCoastersWithRatings,
-    getCoastersWithRatingsAndParks,
-    getParkRating,
-    getParkWithRating,
-    getParksWithRatings
+    create,
+    find,
+    findOne,
+    findById,
+    findOneAndUpdate,
+    deleteOne,
+    deleteMany,
+    deleteCoaster,
+    deletePark
 };
