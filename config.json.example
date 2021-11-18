@@ -1,0 +1,12 @@
+
+{
+    "env": "development",
+    "port": 3000,
+    "session-secret": SESSION_SECRET_HERE,
+    "db": {
+        "host": "localhost",
+        "name": "coaster-reviews",
+        "username": USERNAME_HERE,
+        "password": PASSWORD_HERE
+    }
+}
