@@ -25,11 +25,13 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.use(flash());
 
-app.use((req, _, next) => {
-    console.log("Request method:", req.method);
-    console.log("Request path:", req.path, "\n");
-    next();
-});
+if(config.get("env") === "development") {
+    app.use((req, _, next) => {
+        console.log("Request method:", req.method);
+        console.log("Request path:", req.path, "\n");
+        next();
+    });
+}
 
 app.use((req, res, next) => {
     res.locals.errorMessage = req.flash("errorMessage");
@@ -38,6 +40,7 @@ app.use((req, res, next) => {
 });
 
 // decorator for async route handlers
+// inspired by https://stackoverflow.com/questions/61086833/async-await-in-express-middleware
 function getAsyncHandler(asyncHandler) {
     return function(req, res, next) {
         asyncHandler(req, res, next).catch(next);
