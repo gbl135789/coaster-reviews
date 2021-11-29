@@ -177,7 +177,8 @@ const opsTable = {
     findById: (model, args) => model.findById(...args),
     findOneAndUpdate: (model, args) => model.findOneAndUpdate(...args),
     deleteOne: (model, args) => model.deleteOne(...args),
-    deleteMany: (model, args) => model.deleteMany(...args)
+    deleteMany: (model, args) => model.deleteMany(...args),
+    count: (model, args) => model.count(...args)
 };
 
 Object.freeze(opsTable);
@@ -225,6 +226,10 @@ function deleteMany(model, query) {
     return dispatchOnModel(model, "deleteMany", query);
 }
 
+function count(model, query) {
+    return dispatchOnModel(model, "count", query);
+}
+
 async function deleteCoaster(query) {
     const coaster = await findOne("Coaster", query);
     if(coaster) {
@@ -254,6 +259,7 @@ module.exports = {
     findOneAndUpdate,
     deleteOne,
     deleteMany,
+    count,
     deleteCoaster,
     deletePark
 };

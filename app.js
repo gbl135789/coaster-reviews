@@ -47,9 +47,14 @@ function getAsyncHandler(asyncHandler) {
     };
 }
 
-app.get("/", (req, res) => {
-    res.render("index");
-});
+app.get("/", getAsyncHandler(async (req, res) => {
+    res.render("index", {
+        numUsers: await db.count("User", {}),
+        numReviews: await db.count("Review", {}),
+        numParks: await db.count("Park", {}),
+        numCoasters: await db.count("Coaster", {})
+    });
+}));
 
 app.get("/parks", getAsyncHandler(async (req, res) => {
     const parks = await db.find("Park", {});
@@ -69,18 +74,28 @@ app.get("/parks", getAsyncHandler(async (req, res) => {
 app.get("/coasters", getAsyncHandler(async (req, res) => {
     const coasters = await db.find("Coaster", {});
     res.render("coasters", {
-        coasters: await Promise.all(coasters.map(async c => ({
-            name: c.name,
-            park: await db.findOne("Park", { coasters: c._id }),
-            rating: await c.getRating(),
-            slug: c.slug,
-            deletable: auth.isAdmin(req)
-        })))
+        coasters: await Promise.all(coasters.map(async c => {
+            const park = await db.findOne("Park", { coasters: c._id });
+            return {
+                name: c.name,
+                rating: await c.getRating(),
+                slug: c.slug,
+                deletable: auth.isAdmin(req),
+                park: {
+                    name: park.name,
+                    slug: park.slug
+                }
+            };
+        }))
     });
 }));
 
 app.get("/login", (req, res) => {
-    res.render("login");
+    if(!auth.isAuthenticated(req)) {
+        res.render("login");
+    } else {
+        res.redirect("/account");
+    }
 });
 
 app.post("/login", passport.authenticate("local-login", {
@@ -90,7 +105,11 @@ app.post("/login", passport.authenticate("local-login", {
 }));
 
 app.get("/register", (req, res) => {
-    res.render("register");
+    if(!auth.isAuthenticated(req)) {
+        res.render("register");
+    } else {
+        res.redirect("/account");
+    }
 });
 
 app.post("/register", passport.authenticate("local-register", {
@@ -105,21 +124,32 @@ app.get("/account", getAsyncHandler(async (req, res) => {
         const reviews = await db.find("Review", { author: user._id });
         res.render("account", {
             username: req.user.username,
-            reviews: await Promise.all(reviews.map(async r => ({
-                rating: r.rating,
-                postDate: r.postDate,
-                postTime: r.postTime,
-                body: r.body,
-                slug: r.slug,
-                coaster: await db.findOne("Coaster", { reviews: r._id })
-            })))
+            reviews: await Promise.all(reviews.map(async r => {
+                const coaster = await db.findOne("Coaster", { reviews: r._id });
+                const park = await db.findOne("Park", { coasters: coaster._id });
+                return {
+                    rating: r.rating,
+                    postDate: r.postDate,
+                    postTime: r.postTime,
+                    body: r.body,
+                    slug: r.slug,
+                    coaster: {
+                        name: coaster.name,
+                        slug: coaster.slug,
+                        park: {
+                            name: park.name,
+                            slug: park.slug
+                        }
+                    }
+                };
+            }))
         });
     } else {
         res.redirect("/login");
     }
 }));
 
-app.get("/logout", (req, res) => {
+app.post("/logout", (req, res) => {
     req.logout();
     req.flash("successMessage", "Successfully logged out");
     res.redirect("/login");

@@ -19,6 +19,11 @@ li:nth-child(odd) {
     background-color:cornsilk;
 }
 
+.stats > li {
+    margin-bottom: 15px;
+    background-color: cornsilk;
+}
+
 a {
     color: navy;
     text-decoration: none;
