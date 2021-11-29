@@ -66,7 +66,8 @@ app.get("/parks", getAsyncHandler(async (req, res) => {
             location: p.location,
             rating: await p.getRating(),
             slug: p.slug,
-            deletable: isAdmin
+            deletable: isAdmin,
+            numReviews: await p.getNumReviews()
         })))
     });
 }));
@@ -81,6 +82,7 @@ app.get("/coasters", getAsyncHandler(async (req, res) => {
                 rating: await c.getRating(),
                 slug: c.slug,
                 deletable: auth.isAdmin(req),
+                numReviews: await c.getNumReviews(),
                 park: {
                     name: park.name,
                     slug: park.slug
@@ -228,6 +230,8 @@ app.get("/:park/:coaster", getAsyncHandler(async (req, res) => {
         coaster: {
             name: coaster.name,
             rating: await coaster.getRating(),
+            slug: coaster.slug,
+            numReviews: await coaster.getNumReviews(),
             reviews: reviews.map(r => ({
                 author: r.author,
                 rating: r.rating,
@@ -236,8 +240,7 @@ app.get("/:park/:coaster", getAsyncHandler(async (req, res) => {
                 body: r.body,
                 slug: r.slug,
                 deletable: auth.isAdmin(req) || (isAuthenticated && req.user.username === r.author.username)
-            })),
-            slug: coaster.slug
+            }))
         }
     });
 }));
@@ -252,13 +255,15 @@ app.get("/:park", getAsyncHandler(async (req, res) => {
             name: park.name,
             location: park.location,
             rating: await park.getRating(),
-            slug: park.slug
+            slug: park.slug,
+            numReviews: await park.getNumReviews()
         },
         coasters: await Promise.all(coasters.map(async c => ({
             name: c.name,
             rating: await c.getRating(),
             slug: c.slug,
-            deletable: isAdmin
+            deletable: isAdmin,
+            numReviews: await c.getNumReviews()
         })))
     });
 }));

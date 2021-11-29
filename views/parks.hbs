@@ -17,7 +17,7 @@
     {{#each parks}}
         <li>
             <a href="/{{slug}}">{{name}}</a> - {{location}}<br>
-            Rating: &#9733;{{rating}}<br>
+            Rating: &#9733;{{rating}} ({{numReviews}} reviews)<br>
             {{#if deletable}}
                 <form method="POST" action="/{{slug}}/delete-park">
                     <input type="submit" value="Delete">

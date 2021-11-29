@@ -138,6 +138,10 @@ coasterSchema.methods.getRating = async function() {
     return reviews.length === 0 ? "N/A" : (reviews.reduce((sum, r) => sum + r.rating, 0.0) / reviews.length).toFixed(2);
 };
 
+coasterSchema.methods.getNumReviews = function() {
+    return count("Review", { _id: {$in: this.reviews} });
+};
+
 // park schema methods
 
 parkSchema.methods.getRating = async function() {
@@ -153,6 +157,16 @@ parkSchema.methods.getRating = async function() {
     }
 
     return ratedCoasters === 0 ? "N/A" : (totalRating / ratedCoasters).toFixed(2);
+};
+
+parkSchema.methods.getNumReviews = async function() {
+    const coasters = await find("Coaster", { _id: {$in: this.coasters} });
+    let numReviews = 0;
+    for(const c of coasters) {
+        numReviews += await c.getNumReviews();
+    }
+
+    return numReviews;
 };
 
 // middleware for salting and hashing password
