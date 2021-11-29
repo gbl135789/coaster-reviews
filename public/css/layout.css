@@ -27,6 +27,12 @@
     padding-right: 5px;
 }
 
-/* form, form > input, form > textarea {
+table {
+    min-width: 50%;
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 15px;
     border: 1px solid black;
-} */
+}
