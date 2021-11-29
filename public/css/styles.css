@@ -23,6 +23,10 @@ th, td {
     text-align: right;
 }
 
+th {
+    background-color: gainsboro;
+}
+
 a {
     color: navy;
     text-decoration: none;

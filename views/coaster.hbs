@@ -40,7 +40,7 @@
                 </div>
                 {{body}}<br>
                 {{#if deletable}}
-                    <form method="POST" action="/{{slug}}/delete-review">
+                    <form method="POST" action="/{{slug}}/delete-review" class="deleteButton">
                         <input type="submit" value="Delete">
                     </form>
                 {{/if}}

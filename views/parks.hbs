@@ -19,7 +19,7 @@
             <a href="/{{slug}}">{{name}}</a> - {{location}}<br>
             Rating: &#9733;{{rating}} ({{numReviews}} reviews)<br>
             {{#if deletable}}
-                <form method="POST" action="/{{slug}}/delete-park">
+                <form method="POST" action="/{{slug}}/delete-park" class="deleteButton">
                     <input type="submit" value="Delete">
                 </form>
             {{/if}}

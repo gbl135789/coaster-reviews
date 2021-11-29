@@ -17,7 +17,7 @@
                     <a href="/{{coaster.park.slug}}/{{coaster.slug}}">{{coaster.name}}</a> - <a href="/{{coaster.park.slug}}">{{coaster.park.name}}</a> &#9733;{{rating}} ({{postDate}} at {{postTime}})
                 </div>
                 {{body}}<br>
-                <form method="POST" action="/{{slug}}/delete-review">
+                <form method="POST" action="/{{slug}}/delete-review" class="deleteButton">
                     <input type="submit" value="Delete">
                 </form>
             </div>

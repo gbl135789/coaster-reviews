@@ -21,7 +21,7 @@
             <a href="/{{../park.slug}}/{{slug}}">{{name}}</a><br>
             Rating: &#9733;{{rating}} ({{numReviews}} reviews)<br>
             {{#if deletable}}
-                <form method="POST" action="/{{slug}}/delete-coaster">
+                <form method="POST" action="/{{slug}}/delete-coaster" class="deleteButton">
                     <input type="submit" value="Delete">
                 </form>
             {{/if}}

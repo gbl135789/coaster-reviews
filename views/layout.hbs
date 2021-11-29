@@ -24,19 +24,17 @@
                 </nav>
             </header>
 
-            {{#if errorMessage}}
-                <div class="errorMessage">
-                    <p>{{errorMessage}}</p>
-                </div>
-            {{/if}}
+            <div id="main">
+                {{#if errorMessage}}
+                    <p class="errorMessage">{{errorMessage}}</p>
+                {{/if}}
 
-            {{#if successMessage}}
-                <div class="successMessage">
-                    <p>{{successMessage}}</p>
-                </div>
-            {{/if}}
+                {{#if successMessage}}
+                    <p class="successMessage">{{successMessage}}</p>
+                {{/if}}
             
-            {{{ body }}}
+                {{{ body }}}
+            </div>
         </div>
     </body>
 </html>
