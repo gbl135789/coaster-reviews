@@ -37,6 +37,10 @@
     margin-right: 0;
 }
 
+.reviewHeader {
+    margin-bottom: 15px;
+}
+
 table {
     min-width: 50%;
     border-collapse: collapse;
