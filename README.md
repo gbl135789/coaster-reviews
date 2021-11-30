@@ -122,11 +122,8 @@ Common header:
 * (1 point) Messages displayed on redirect
   * Candidates: Connect flash
   * When browsing a website, various errors may occur. It would be helpful to the user to know whether or not a redirect heppened due to an error. I will use a library to help me store and retrieve appropriate messages upon each redirect.
-* (4 points, estimated) Front end framework (time permitting)
-  * Candidates: React, Vue, Angular
-  * These frameworks provide powerful methods for creating and managing user interfaces. I will use a framework to handle site presentation and user interactivity such as sorting, filtering, posting/deleting reviews, etc.
 
-Total points: 8 (12 if time permitting)
+Total points: 8
 
 
 ## [Link to Initial Main Project File](app.js) 
