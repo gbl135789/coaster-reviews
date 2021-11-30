@@ -29,9 +29,10 @@ module.exports = {
         "no-multi-spaces": ["error"],
         "no-lone-blocks": ["error"],
         "no-self-compare": ["error"],
+        "no-unused-vars": ["error", {"args": "none"}],
         "no-unused-expressions": ["error"],
         "no-useless-call": ["error"],
-        "no-use-before-define": ["error"],
+        "no-use-before-define": ["error", {"functions": false}],
 
         "camelcase": ["error", {properties: "never"}],
         "func-call-spacing": ["error"],
