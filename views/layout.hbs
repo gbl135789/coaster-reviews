@@ -11,30 +11,36 @@
     </head>
 
     <body>
-        <div id="root">
-            <header id="siteHeader">
-                <h1 id="siteTitle">
-                    <a href="/">Coaster Reviews</a>
-                </h1>
+        <div id="bg1">
+        <div id="bg2">
+        <div id="bg3">
+            <div id="root">
+                <header id="siteHeader">
+                    <h1 id="siteTitle">
+                        <a href="/">Coaster Reviews</a>
+                    </h1>
 
-                <nav id="siteNav">
-                    <a class="navLink" href="/parks">Parks</a>
-                    <a class="navLink" href="/coasters">Coasters</a>
-                    <a class="navLink" href="/account">Account</a>
-                </nav>
-            </header>
+                    <nav id="siteNav">
+                        <a class="navLink" href="/parks">Parks</a>
+                        <a class="navLink" href="/coasters">Coasters</a>
+                        <a class="navLink" href="/account">Account</a>
+                    </nav>
+                </header>
 
-            <div id="main">
-                {{#if errorMessage}}
-                    <p class="errorMessage">{{errorMessage}}</p>
-                {{/if}}
+                <div id="main">
+                    {{#if errorMessage}}
+                        <p class="errorMessage">{{errorMessage}}</p>
+                    {{/if}}
 
-                {{#if successMessage}}
-                    <p class="successMessage">{{successMessage}}</p>
-                {{/if}}
-            
-                {{{ body }}}
+                    {{#if successMessage}}
+                        <p class="successMessage">{{successMessage}}</p>
+                    {{/if}}
+                
+                    {{{ body }}}
+                </div>
             </div>
+        </div>
+        </div>
         </div>
     </body>
 </html>

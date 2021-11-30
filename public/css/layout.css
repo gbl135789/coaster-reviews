@@ -1,21 +1,32 @@
 
-#root {
-    width: 75%;
-    margin: auto;
+* {
+    margin: 0;
 }
 
-#root > :not(h2):not(h3):not(li):not(p):not(form):not(.table), #siteTitle, h3, ul, .deleteButton {
-    margin: 5px 0px 5px 0px;
+#root {
+    width: 75%;
+    min-width: calc(100% - 220px);
+    min-height: 100vh;
+    margin: auto;
+    border-left: 3px solid maroon;
+    border-right: 3px solid maroon;
+}
+
+#root > *, #siteTitle, h3, ul, .deleteButton {
     padding: 5px 0px 5px 0px;
 }
 
-h2, #main > h3, li, p, form, .table {
-    margin: 5px 5px 5px 5px;
-    padding: 5px 15px 5px 15px;
+#siteHeader, h2, #main > h3, li, p, form, .table {
+    padding: 15px 15px 15px 15px;
+}
+
+#main, ul {
+    padding-top: 0px;
 }
 
 #siteHeader {
     text-align: center;
+    padding-bottom: 15px;
 }
 
 .navLink {

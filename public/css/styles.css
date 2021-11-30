@@ -1,4 +1,24 @@
 
+#bg1 {
+    background-image: url("../images/site-bg.png");
+    background-position: left top;
+    background-repeat: repeat-y;
+}
+
+#bg2 {
+    background-image: url("../images/site-bg.png");
+    background-position: right top;
+    background-repeat: repeat-y;
+}
+
+#bg3 {
+    background: linear-gradient(90deg, rgba(128,0,0,0.5) 0%, rgba(255,255,255,1) 50%, rgba(128,0,0,0.5) 100%);
+}
+
+#root {
+    background-color: white;
+}
+
 .errorMessage {
     background-color: rgba(255, 0, 0, 0.3);
 }
@@ -7,8 +27,17 @@
     background-color: rgba(0, 255, 0, 0.3);
 }
 
+#siteHeader {
+    background: rgb(255,255,255);
+    background: radial-gradient(circle, rgba(255,255,255,0.05) 25%, rgba(115,147,179,1) 100%);
+}
+
+#siteTitle > * {
+    color: maroon;
+}
+
 h2 {
-    background-color: gainsboro;
+    background-color: rgb(175, 175, 175);
 }
 
 ul {
@@ -16,7 +45,7 @@ ul {
 }
 
 li:nth-child(odd) {
-    background-color:cornsilk;
+    background-color: rgba(115,147,179,0.25);
 }
 
 th, td {
@@ -28,14 +57,15 @@ th {
 }
 
 a {
-    color: navy;
+    color: #003166;
     text-decoration: none;
 }
 
 a:hover {
     color: gray;
+    text-decoration: underline;
 }
 
 a:visited {
-    color: navy;
+    color: #003166;
 }
